@@ -412,6 +412,7 @@ const RouteForm = () => {
             let response = await axios.post("http://localhost:3000/routes/add", FormData, {
                 headers: {
                     "Content-type": "Application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
             })
 
@@ -659,6 +660,7 @@ const BusForm = () => {
             let response = await axios.post("http://localhost:3000/bus/add", busData, {
                 headers: {
                     "Content-type": "Application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
             })
 
