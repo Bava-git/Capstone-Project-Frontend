@@ -51,6 +51,11 @@ const HomePage = () => {
             }
         })
 
+        if (!filterItem) {
+            toast.error("Sorry, Bus not available for selected route");
+            return;
+        }
+
         let route_id = filterItem[0].routeInfo_id;
 
         Navigate(

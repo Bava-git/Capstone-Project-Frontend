@@ -180,7 +180,7 @@ const PassengerForm = () => {
             return;
         }
 
-        // Display out
+        // Display the error
         if (!isEmailValid) {
             toast.error("Enter a valid email address!");
             return;

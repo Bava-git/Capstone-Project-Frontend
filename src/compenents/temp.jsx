@@ -13,8 +13,6 @@ import available_male_seater from '../assets/icons/seater_male.svg'
 import available_male_sleeper from '../assets/icons/sl_male.svg'
 import selected_seater from '../assets/icons/seater_selected.svg'
 import selected_sleeper from '../assets/icons/sl_selected.svg'
-import selected_male_seater from '../assets/icons/seater_male_selected.svg'
-import selected_female_seater from '../assets/icons/seater_female_selected.svg'
 import selected_male_slepeer from '../assets/icons/sl_selected_male.svg'
 import selected_female_slepeer from '../assets/icons/sl_selected_female.svg'
 import blocked_female_seater from '../assets/icons/seat-fem-blocked.svg'
@@ -227,7 +225,7 @@ const ResultPage = () => {
                     </div>
                     <div className="othercontent-field">
                         <p>Bording Date:</p>
-                        <p> {booked_date ? format(booked_date, "dd-MM-yyyy") : ""}</p >
+                        <p> {format(booked_date || "", "dd-MM-yyyy")}</p >
                     </div>
                     <div className="othercontent-field">
                         <p>Boarding Time/ Dropping Time:</p>
@@ -255,11 +253,11 @@ const ResultPage = () => {
                 <div className="othercontent-busdetails">
                     <div className="othercontent-field">
                         <p>Contact email: </p>
-                        <input type="email" name="email" id="" onChange={(event) => setemail(event.target.value)} />
+                        <input type="email" name="" id="" onChange={(event) => setemail(event.target.value)} />
                     </div>
                     <div className="othercontent-field">
                         <p>Mobile Number: </p>
-                        <input type="text" name="mobilenumber" id="" onChange={(event) => setmobilenum(event.target.value)} />
+                        <input type="text" name="" id="" onChange={(event) => setmobilenum(event.target.value)} />
                     </div>
                 </div>
                 <p className='othercontent-title'>Payment method</p>
@@ -293,46 +291,21 @@ const ResultPage = () => {
         }
         let AlreadyCreated = [];
         let BookedSeats = [];
-        const maleholdSeat = [];
-        const femaleholdSeat = [];
         blockedSeatsArr.map((bookedseat) => {
-            let seat = bookedseat.bookedSeatNum;
-            BookedSeats.push(seat);
-            ((bookedseat.passenger_gender === "Male") ?
-                ((Number(seat.substring(2)) % 2 === 0) ?
-                    maleholdSeat.push(seat.substring(0, 2) + (Number(seat.substring(2)) - 1)) : maleholdSeat.push(seat.substring(0, 2) + (Number(seat.substring(2)) + 1))) :
-                ((Number(seat.substring(2)) % 2 === 0) ?
-                    femaleholdSeat.push(seat.substring(0, 2) + (Number(seat.substring(2)) - 1)) : femaleholdSeat.push(seat.substring(0, 2) + (Number(seat.substring(2)) + 1)))
-            )
+            BookedSeats.push(bookedseat.bookedSeatNum);
         })
         setLowerLeft(leftseatnum.map((seat) => (
-            blockedSeatsArr.length > 0 ? (
-                blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ? (
-                    <div className='perseat' key={seat}>
-                        < label className='blockedseats' >
-                            {leftseattype === "Seater" ?
-                                <><img src={blockedseats.passenger_gender === "Male" ? blocked_male_seater : blocked_female_seater} alt="" className='seater-icon' />
-                                    <span className='perseatprice'>sold</span></>
-                                : <>< img src={blockedseats.passenger_gender === "Male" ? blocked_male_sleeper : blocked_female_sleeper} alt="" className='sleeper-icon' />
-                                    <span className='perseatprice'>sold</span></>}
-                        </label>
-                    </div >
-                ) : (!BookedSeats.includes(seat) && !AlreadyCreated.includes(seat)) ? AlreadyCreated.push(seat) && (
-                    <div className='perseat' key={seat} >
-                        < label className='selector' >
-                            <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
-                            {leftseattype === "Seater" ?
-                                <><img src={selectedArr.includes(seat) ? selected_seater : available_seater} alt="" className='seater-icon' />
-                                    <span className='perseatprice'>&#8377;{lowerleftseaterprice}</span></>
-                                :
-                                <><img src={selectedArr.includes(seat) ? selected_sleeper : available_sleeper} alt="" className='sleeper-icon' />
-                                    <span className='perseatprice'>&#8377;{lowerleftsleeperprice}</span></>}
-                        </label >
-                    </div >
-                ) : (<>
-                </>)
-                )
-            ) : (
+            blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ? (
+                <div className='perseat' key={seat}>
+                    < label className='blockedseats' >
+                        {leftseattype === "Seater" ?
+                            <><img src={blockedseats.passenger_gender === "Male" ? blocked_male_seater : blocked_female_seater} alt="" className='seater-icon' />
+                                <span className='perseatprice'>sold</span></>
+                            : <>< img src={blockedseats.passenger_gender === "Male" ? blocked_male_sleeper : blocked_female_sleeper} alt="" className='sleeper-icon' />
+                                <span className='perseatprice'>sold</span></>}
+                    </label>
+                </div >
+            ) : (!BookedSeats.includes(seat) && !AlreadyCreated.includes(seat)) ? AlreadyCreated.push(seat) && (
                 <div className='perseat' key={seat} >
                     < label className='selector' >
                         <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
@@ -344,11 +317,13 @@ const ResultPage = () => {
                                 <span className='perseatprice'>&#8377;{lowerleftsleeperprice}</span></>}
                     </label >
                 </div >
-            )
-        )));
+            ) : (<>
+            </>)
+            ))));
 
-
-
+        // console.log(AlreadyCreated);
+        // console.log(BookedSeats);
+        console.log(LowerLeft);
 
         const rightseatnum = [];
         let rightseattype = Bus.lower_right;
@@ -358,75 +333,63 @@ const ResultPage = () => {
             rightseatnum.push("LR" + i);
         }
         AlreadyCreated.length = 0
+        const maleholdSeat = [];
+        const femaleholdSeat = [];
         setLowerRight(rightseatnum.map((seat) => (
-            blockedSeatsArr.length > 0 ? (
-                blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ?
-                    (
-                        < div className='perseat' key={seat} >
-                            < label className='blockedseats' >
-                                {rightseattype === "Seater" ?
-                                    <><img src={blockedseats.passenger_gender === "Male" ? blocked_male_seater : blocked_female_seater} alt="" className='seater-icon' />
-                                        <span className='perseatprice'>sold</span></>
-                                    : <>< img src={blockedseats.passenger_gender === "Male" ? blocked_male_sleeper : blocked_female_sleeper} alt="" className='sleeper-icon' />
-                                        <span className='perseatprice'>sold</span></>}
-                            </label>
-                        </div >
-                    ) : (!BookedSeats.includes(seat) && !AlreadyCreated.includes(seat) && !maleholdSeat.includes(seat) && !femaleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
-                        <div className='perseat' key={seat} >
-                            < label className='selector' >
-                                <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
-                                {rightseattype === "Seater" ?
-                                    <><img src={selectedArr.includes(seat) ? selected_seater : available_seater} alt="" className='seater-icon' />
-                                        <span className='perseatprice'>&#8377;{lowerrightseaterprice}</span></>
-                                    :
-                                    <><img src={selectedArr.includes(seat) ? selected_sleeper : available_sleeper} alt="" className='sleeper-icon' />
-                                        <span className='perseatprice'>&#8377;{lowerrightsleeperprice}</span></>}
-                            </label >
-                        </div >
-                    ) : (!AlreadyCreated.includes(seat) && maleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
-                        <div className='perseat' key={seat} >
-                            < label className='selector' >
-                                <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
-                                {rightseattype === "Seater" ?
-                                    <><img src={selectedArr.includes(seat) ? selected_male_seater : available_male_seater} alt="" className='seater-icon' />
-                                        <span className='perseatprice'>&#8377;{lowerrightseaterprice}</span></>
-                                    :
-                                    <><img src={selectedArr.includes(seat) ? selected_male_slepeer : available_male_sleeper} alt="" className='sleeper-icon' />
-                                        <span className='perseatprice'>&#8377;{lowerrightsleeperprice}</span></>}
-                            </label >
-                        </div >
-                    ) : (!AlreadyCreated.includes(seat) && femaleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
-                        <div className='perseat' key={seat} >
-                            < label className='selector' >
-                                <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
-                                {rightseattype === "Seater" ?
-                                    <><img src={selectedArr.includes(seat) ? selected_female_seater : available_female_seater} alt="" className='seater-icon' />
-                                        <span className='perseatprice'>&#8377;{lowerrightseaterprice}</span></>
-                                    :
-                                    <><img src={selectedArr.includes(seat) ? selected_female_slepeer : available_female_sleeper} alt="" className='sleeper-icon' />
-                                        <span className='perseatprice'>&#8377;{lowerrightsleeperprice}</span></>}
-                            </label >
-                        </div >
-                    ) : (<></>)
-                )
-            ) : (
-                <div className='perseat' key={seat} >
-                    < label className='selector' >
-                        <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
-                        {rightseattype === "Seater" ?
-                            <><img src={selectedArr.includes(seat) ? selected_seater : available_seater} alt="" className='seater-icon' />
-                                <span className='perseatprice'>&#8377;{lowerrightseaterprice}</span></>
-                            :
-                            <><img src={selectedArr.includes(seat) ? selected_sleeper : available_sleeper} alt="" className='sleeper-icon' />
-                                <span className='perseatprice'>&#8377;{lowerrightsleeperprice}</span></>}
-                    </label >
-                </div >
-            )
-        )));
-
-        console.log("AlreadyCreated " + AlreadyCreated);
-        console.log("maleholdSeat " + maleholdSeat);
-        console.log("femaleholdSeat " + femaleholdSeat);
+            blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ?
+                ((blockedseats.passenger_gender === "Male") ?
+                    ((Number(seat.substring(2)) % 2 === 0) ? maleholdSeat.push("LR" + (Number(seat.substring(2)) - 1)) : maleholdSeat.push("LR" + (Number(seat.substring(2)) + 1))) :
+                    ((Number(seat.substring(2)) % 2 === 0) ? femaleholdSeat.push("LR" + (Number(seat.substring(2)) - 1)) : femaleholdSeat.push("LR" + (Number(seat.substring(2)) + 1)))
+                ) && (
+                    < div className='perseat' key={seat} >
+                        < label className='blockedseats' >
+                            {rightseattype === "Seater" ?
+                                <><img src={blockedseats.passenger_gender === "Male" ? blocked_male_seater : blocked_female_seater} alt="" className='seater-icon' />
+                                    <span className='perseatprice'>sold</span></>
+                                : <>< img src={blockedseats.passenger_gender === "Male" ? blocked_male_sleeper : blocked_female_sleeper} alt="" className='sleeper-icon' />
+                                    <span className='perseatprice'>sold</span></>}
+                        </label>
+                    </div >
+                ) : (!BookedSeats.includes(seat) && !AlreadyCreated.includes(seat) && !maleholdSeat.includes(seat) && !femaleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
+                    <div className='perseat' key={seat} >
+                        < label className='selector' >
+                            <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
+                            {rightseattype === "Seater" ?
+                                <><img src={selectedArr.includes(seat) ? selected_seater : available_seater} alt="" className='seater-icon' />
+                                    <span className='perseatprice'>&#8377;{lowerleftseaterprice}</span></>
+                                :
+                                <><img src={selectedArr.includes(seat) ? selected_sleeper : available_sleeper} alt="" className='sleeper-icon' />
+                                    <span className='perseatprice'>&#8377;{lowerleftsleeperprice}</span></>}
+                        </label >
+                    </div >
+                ) : (!AlreadyCreated.includes(seat) && maleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
+                    <div className='perseat' key={seat} >
+                        < label className='selector' >
+                            <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
+                            {rightseattype === "Seater" ?
+                                <><img src={selectedArr.includes(seat) ? selected_seater : available_male_seater} alt="" className='seater-icon' />
+                                    <span className='perseatprice'>&#8377;{lowerleftseaterprice}</span></>
+                                :
+                                <><img src={selectedArr.includes(seat) ? selected_male_slepeer : available_male_sleeper} alt="" className='sleeper-icon' />
+                                    <span className='perseatprice'>&#8377;{lowerleftsleeperprice}</span></>}
+                        </label >
+                    </div >
+                ) : (!AlreadyCreated.includes(seat) && femaleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
+                    <div className='perseat' key={seat} >
+                        < label className='selector' >
+                            <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
+                            {rightseattype === "Seater" ?
+                                <><img src={selectedArr.includes(seat) ? selected_seater : available_female_seater} alt="" className='seater-icon' />
+                                    <span className='perseatprice'>&#8377;{lowerleftseaterprice}</span></>
+                                :
+                                <><img src={selectedArr.includes(seat) ? selected_female_slepeer : available_female_sleeper} alt="" className='sleeper-icon' />
+                                    <span className='perseatprice'>&#8377;{lowerleftsleeperprice}</span></>}
+                        </label >
+                    </div >
+                ) : (<></>)
+            ))));
+        // console.log("maleholdSeat " + maleholdSeat);
+        // console.log("femaleholdSeat " + femaleholdSeat);
 
         if (Bus.isUpperDeck) {
 
@@ -436,48 +399,37 @@ const ResultPage = () => {
             for (let i = 1; i <= upperleftRun; i++) {
                 upperleftseatnum.push("UL" + i);
             }
-            AlreadyCreated.length = 0
-            setUpperLeft(upperleftseatnum.map((seat) => (
-                blockedSeatsArr.length > 0 ? (
-                    blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ? (
-                        <div className='perseat' key={seat}>
-                            < label className='blockedseats' >
-                                {upperleftseattype === "Seater" ?
-                                    <><img src={blockedseats.passenger_gender === "Male" ? blocked_male_seater : blocked_female_seater} alt="" className='seater-icon' />
-                                        <span className='perseatprice'>sold</span></>
-                                    : <>< img src={blockedseats.passenger_gender === "Male" ? blocked_male_sleeper : blocked_female_sleeper} alt="" className='sleeper-icon' />
-                                        <span className='perseatprice'>sold</span></>}
-                            </label>
-                        </div >
-                    ) : (!BookedSeats.includes(seat) && !AlreadyCreated.includes(seat)) ? AlreadyCreated.push(seat) && (
-                        <div className='perseat' key={seat} >
-                            < label className='selector' >
-                                <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
-                                {upperleftseattype === "Seater" ?
-                                    <><img src={selectedArr.includes(seat) ? selected_seater : available_seater} alt="" className='seater-icon' />
-                                        <span className='perseatprice'>&#8377;{upperleftsleeperprice}</span></>
-                                    :
-                                    <><img src={selectedArr.includes(seat) ? selected_sleeper : available_sleeper} alt="" className='sleeper-icon' />
-                                        <span className='perseatprice'>&#8377;{upperleftsleeperprice}</span></>}
-                            </label >
-                        </div >
-                    ) : (<>
-                    </>)
-                    )
-                ) : (
-                    <div className='perseat' key={seat} >
-                        < label className='selector' >
-                            <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
+            setUpperLeft(upperleftseatnum.map((seat, index) => (
+                <div className='perseat' key={seat}>
+                    {((blockedSeatsArr[index]?.bookedSeatNum) === seat) ? (
+                        <label className='selector'>
+                            <input type="checkbox" disabled
+                                checked={selectedArr.includes(seat)}
+                                onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
                             {upperleftseattype === "Seater" ?
-                                <><img src={selectedArr.includes(seat) ? selected_seater : available_seater} alt="" className='seater-icon' />
-                                    <span className='perseatprice'>&#8377;{upperleftsleeperprice}</span></>
+                                <img src={(blockedSeatsArr[index]?.passenger_gender) === "Male" ? blocked_male_seater : blocked_female_seater} alt="" className='seater-icon' />
+                                : (<img src={(blockedSeatsArr[index]?.passenger_gender) === "Male" ? blocked_male_sleeper : blocked_female_sleeper} alt="" className='sleeper-icon' />)
+                            }
+                            <span className='perseatprice'>sold</span>
+                        </label>
+                    ) : (
+                        <label className='selector'>
+                            <input type="checkbox"
+                                checked={selectedArr.includes(seat)}
+                                onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
+                            {upperleftseattype === "Seater" ?
+                                <img src={selectedArr.includes(seat) ? selected_seater : available_seater} alt="" className='seater-icon' />
                                 :
-                                <><img src={selectedArr.includes(seat) ? selected_sleeper : available_sleeper} alt="" className='sleeper-icon' />
-                                    <span className='perseatprice'>&#8377;{upperleftsleeperprice}</span></>}
-                        </label >
-                    </div >
-                )
-            )));
+                                <img src={selectedArr.includes(seat) ? selected_sleeper : available_sleeper} alt="" className='sleeper-icon' />
+                            }
+                            {upperleftseattype === "Seater" ?
+                                <span className='perseatprice'>&#8377;{(Bus.ratePerKm * schedule.total_distance)}</span>
+                                :
+                                <span className='perseatprice'>&#8377;{upperleftsleeperprice}</span>
+                            }
+                        </label>)}
+                </div>
+            )))
 
             const upperrightseatnum = [];
             let upperrightseattype = "";
@@ -485,72 +437,39 @@ const ResultPage = () => {
             for (let i = 1; i <= upperrightRun; i++) {
                 upperrightseatnum.push("UR" + i);
             }
-            AlreadyCreated.length = 0;
-            setUpperRight(upperrightseatnum.map((seat) => (
-                blockedSeatsArr.length > 0 ? (
-                    blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ?
-                        (
-                            < div className='perseat' key={seat} >
-                                < label className='blockedseats' >
-                                    {upperrightseattype === "Seater" ?
-                                        <><img src={blockedseats.passenger_gender === "Male" ? blocked_male_seater : blocked_female_seater} alt="" className='seater-icon' />
-                                            <span className='perseatprice'>sold</span></>
-                                        : <>< img src={blockedseats.passenger_gender === "Male" ? blocked_male_sleeper : blocked_female_sleeper} alt="" className='sleeper-icon' />
-                                            <span className='perseatprice'>sold</span></>}
-                                </label>
-                            </div >
-                        ) : (!BookedSeats.includes(seat) && !AlreadyCreated.includes(seat) && !maleholdSeat.includes(seat) && !femaleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
-                            <div className='perseat' key={seat} >
-                                < label className='selector' >
-                                    <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
-                                    {upperrightseattype === "Seater" ?
-                                        <><img src={selectedArr.includes(seat) ? selected_seater : available_seater} alt="" className='seater-icon' />
-                                            <span className='perseatprice'>&#8377;{upperrightsleeperprice}</span></>
-                                        :
-                                        <><img src={selectedArr.includes(seat) ? selected_sleeper : available_sleeper} alt="" className='sleeper-icon' />
-                                            <span className='perseatprice'>&#8377;{upperrightsleeperprice}</span></>}
-                                </label >
-                            </div >
-                        ) : (!AlreadyCreated.includes(seat) && maleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
-                            <div className='perseat' key={seat} >
-                                < label className='selector' >
-                                    <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
-                                    {upperrightseattype === "Seater" ?
-                                        <><img src={selectedArr.includes(seat) ? selected_male_seater : available_male_seater} alt="" className='seater-icon' />
-                                            <span className='perseatprice'>&#8377;{upperrightsleeperprice}</span></>
-                                        :
-                                        <><img src={selectedArr.includes(seat) ? selected_male_slepeer : available_male_sleeper} alt="" className='sleeper-icon' />
-                                            <span className='perseatprice'>&#8377;{upperrightsleeperprice}</span></>}
-                                </label >
-                            </div >
-                        ) : (!AlreadyCreated.includes(seat) && femaleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
-                            <div className='perseat' key={seat} >
-                                < label className='selector' >
-                                    <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
-                                    {upperrightseattype === "Seater" ?
-                                        <><img src={selectedArr.includes(seat) ? selected_female_seater : available_female_seater} alt="" className='seater-icon' />
-                                            <span className='perseatprice'>&#8377;{upperrightsleeperprice}</span></>
-                                        :
-                                        <><img src={selectedArr.includes(seat) ? selected_female_slepeer : available_female_sleeper} alt="" className='sleeper-icon' />
-                                            <span className='perseatprice'>&#8377;{upperrightsleeperprice}</span></>}
-                                </label >
-                            </div >
-                        ) : (<></>)
-                    )
-                ) : (
-                    <div className='perseat' key={seat} >
-                        < label className='selector' >
-                            <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
-                            {upperrightseattype === "Seater" ?
-                                <><img src={selectedArr.includes(seat) ? selected_seater : available_seater} alt="" className='seater-icon' />
-                                    <span className='perseatprice'>&#8377;{upperrightsleeperprice}</span></>
-                                :
-                                <><img src={selectedArr.includes(seat) ? selected_sleeper : available_sleeper} alt="" className='sleeper-icon' />
-                                    <span className='perseatprice'>&#8377;{upperrightsleeperprice}</span></>}
-                        </label >
-                    </div >
-                )
-            )));
+            setUpperRight(upperrightseatnum.map((seat, index) => (
+                <div className='bothseat' key={seat}>
+                    {((blockedSeatsArr[index]?.bookedSeatNum) === seat) ? (
+                        <label className='selector'>
+                            <input type="checkbox" disabled
+                                checked={selectedArr.includes(seat)}
+                                onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
+                            {upperleftseattype === "Seater" ?
+                                <img src={(blockedSeatsArr[index]?.passenger_gender) === "Male" ? blocked_male_seater : blocked_female_seater} alt="" className='seater-icon' />
+                                : (<img src={(blockedSeatsArr[index]?.passenger_gender) === "Male" ? blocked_male_sleeper : blocked_female_sleeper} alt="" className='sleeper-icon' />)
+                            }
+                            <span className='perseatprice'>sold</span>
+                        </label>
+                    ) : (
+                        <div className='perseat' >
+                            <label className='selector'>
+                                <input type="checkbox"
+                                    checked={selectedArr.includes(seat)}
+                                    onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
+                                {upperrightseattype === "Seater" ?
+                                    <img src={selectedArr.includes(seat) ? selected_seater : available_seater} alt="" className='seater-icon' />
+                                    :
+                                    <img src={selectedArr.includes(seat) ? selected_sleeper : available_sleeper} alt="" className='sleeper-icon' />
+                                }
+                                {upperrightseattype === "Seater" ?
+                                    <span className='perseatprice'>&#8377;{(Bus.ratePerKm * schedule.total_distance)}</span>
+                                    :
+                                    <span className='perseatprice'>&#8377;{upperrightsleeperprice}</span>
+                                }
+                            </label>
+                        </div >)}
+                </div>
+            )))
         }
     }
 
@@ -702,7 +621,7 @@ const ResultPage = () => {
     const busStorage = [];
     const passengerStorage = [];
 
-    const handleBooking = async () => {
+    const handleBooking = () => {
 
         if (passenger_id === "") {
             toast.error("Please register before book the ticket");
@@ -710,25 +629,9 @@ const ResultPage = () => {
             return;
         }
 
-        // Validate Email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const isEmailValid = emailRegex.test(email);
-
-        // Validate Mobile
-        const isMobileValid = mobilenum.length == 10;
-
-        // Display the error
-        if (!isEmailValid) {
-            toast.error("Enter a valid email address!");
-            return;
-        } else if (!isMobileValid) {
-            toast.error("Enter a valid mobile number!");
-            return;
-        }
-
         const date = new Date();
         const mysqlFormat = date.toISOString().slice(0, 19);
-        LocalStore.forEach((seat) => {
+        LocalStore.forEach(async (seat) => {
 
             busStorage.push({
                 bookedSeatNum: seat,
@@ -755,36 +658,49 @@ const ResultPage = () => {
         });
 
 
+        busStorage.forEach(async (element) => {
+            try {
 
-        try {
+                let response = await axios.post("http://localhost:3000/busbookinginfo/add", element, {
+                    headers: {
+                        "Content-type": "Application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                })
 
-            let blockseatres = await axios.post("http://localhost:3000/busbookinginfo/add/all", busStorage, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                if (response.status === 201) {
+                    // toast.success("Booking store seperatly successfully!");
                 }
-            })
 
-            let passres = await axios.post("http://localhost:3000/passengerbookingInfo/add/all", passengerStorage, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
+            } catch (error) {
+                console.log("Booking Form add: " + error);
+                toast.error(error);
+            }
+        });
 
-            if (blockseatres.status === 201) {
-                if (passres.status === 201) {
-                    toast.success("Tickets are booked successfully!");
+        passengerStorage.forEach(async (element) => {
+            try {
+
+                let response = await axios.post("http://localhost:3000/passengerbookingInfo/add", element, {
+                    headers: {
+                        "Content-type": "Application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                })
+
+                if (response.status === 201) {
+                    toast.success("Booking store seperatly successfully!");
                     setTimeout(() => {
                         Navigate("/history");
-                    }, 2000);
+                    }, 5000);
                 }
-            }
 
-        } catch (error) {
-            console.log("Booking Form add: " + error);
-            toast.error(error);
-        }
+            } catch (error) {
+                console.log("Booking Form add: " + error);
+                toast.error(error);
+            }
+        });
+
 
     }
 

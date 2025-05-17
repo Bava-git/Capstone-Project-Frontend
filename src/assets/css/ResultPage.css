@@ -84,7 +84,7 @@
     height: max-content;
     display: flex;
     flex-direction: column;
-    height: 49em;
+    /* height: 49em; */
     justify-content: flex-end;
 }
 
@@ -154,6 +154,18 @@
     width: max-content;
     height: max-content;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.blockedseats {
+    position: relative;
+    display: inline-block;
+    font-size: 17px;
+    width: max-content;
+    height: max-content;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -273,17 +285,18 @@
     align-items: center;
 }
 
-.filter-title-clearbn{
+.filter-title-clearbn {
     border: 0;
     background-color: transparent;
     cursor: pointer;
-    &:hover{
+
+    &:hover {
         color: blue;
         background-color: #00BFFF;
     }
 }
 
-.busdetails{
+.busdetails {
     margin: 10px;
     padding: 10px;
 }

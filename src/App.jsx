@@ -27,7 +27,7 @@ function App() {
 
   return (
     <>
-      <Toaster expand={true} richColors position='top-right' />
+      <Toaster expand={true} richColors position='top-right' closeButton />
       <BrowserRouter>
         <Header />
         <Routes>
