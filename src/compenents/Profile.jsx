@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'sonner';
-import { format } from 'date-fns';
 import { jwtDecode } from "jwt-decode";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { GetItemById } from '../util/API_HUB';
 
 const Profile = () => {
 
@@ -12,28 +12,14 @@ const Profile = () => {
     let token = localStorage.getItem("token") || "";
     const decoded = jwtDecode(token);
     let passenger_id = decoded.userId;
-    console.log(passenger_id);
 
     useEffect(() => {
-        fetchData();
+
+        GetItemById("passenger", passenger_id).then((data) => {
+            setPassenger(data);
+        });
+
     }, [])
-
-    const fetchData = async () => {
-        try {
-            let response = await axios.get(`http://localhost:3000/passenger/id/${passenger_id}`, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            // console.log(response.data);
-            setPassenger(response.data)
-        } catch (error) {
-            console.log("Profile " + error);
-        }
-    }
-
-
 
     return (
         <div className="profilecontainer">
@@ -158,4 +144,5 @@ const ChangePassword = () => {
     )
 }
 
-export { Profile, ChangePassword };
+export { ChangePassword, Profile };
+

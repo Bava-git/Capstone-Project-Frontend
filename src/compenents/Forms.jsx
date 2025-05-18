@@ -1,9 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
-import { jwtDecode } from "jwt-decode";
+import { createItem, GetItemById, listItem, RegisterNewPassenger, updateItem } from '../util/API_HUB';
 
 const PassengerForm = () => {
 
@@ -27,36 +25,20 @@ const PassengerForm = () => {
 
     useEffect(() => {
         if (passenger_id) {
-            LoadOldData(passenger_id);
+            GetItemById("passenger", passenger_id).then((data) => {
+                setFormData({
+                    passenger_id: data.passenger_id,
+                    passenger_name: data.passenger_name,
+                    passenger_dob: data.passenger_dob,
+                    passenger_gender: data.passenger_gender,
+                    passenger_email: data.passenger_email,
+                    passenger_mobile: data.passenger_mobile,
+                });
+            });
             setRegistered(true);
         }
     }, []);
 
-
-    const LoadOldData = async (passenger_id) => {
-
-        try {
-
-            let response = await axios.get(`http://localhost:3000/passenger/id/${passenger_id}`, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-
-            setFormData({
-                passenger_id: response.data.passenger_id,
-                passenger_name: response.data.passenger_name,
-                passenger_dob: response.data.passenger_dob,
-                passenger_gender: response.data.passenger_gender,
-                passenger_email: response.data.passenger_email,
-                passenger_mobile: response.data.passenger_mobile,
-            });
-
-        } catch (error) {
-            console.log("Patient " + error);
-        }
-    }
 
     const handleUpdate = async (e) => {
         e.preventDefault();
@@ -67,24 +49,13 @@ const PassengerForm = () => {
             return;
         }
 
-        try {
-
-            let response = await axios.put(`http://localhost:3000/passenger/update/${passenger_id}`, FormData, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-
-            if (response.status === 200) {
+        updateItem("passenger", passenger_id, FormData).then((status) => {
+            if (status === 200) {
                 toast.success("Passenger details updated successfully!");
                 resetTheForm();
                 Navigate("/profile");
             }
-
-        } catch (error) {
-            console.log("Passenger Update " + error);
-        }
+        })
     }
 
 
@@ -125,28 +96,13 @@ const PassengerForm = () => {
 
         // console.log(registerData);
 
-        try {
-
-            let response = await axios.post("http://localhost:3000/user/register", registerData, {
-                headers: {
-                    "Content-type": "Application/json",
-                }
-            })
-
-            if (response.status === 201) {
+        RegisterNewPassenger(registerData).then((status) => {
+            if (status === 201) {
                 toast.success("Credential created successfully!");
-                const token = await response.data.token;
-                localStorage.setItem("token", token);
-
-                const decoded = jwtDecode(token);
-                let role = decoded.roles;
-                localStorage.setItem("role", role);
                 setRegistered(true);
             }
+        });
 
-        } catch (error) {
-            console.log("Passenger Registered Form: " + error);
-        }
     }
 
     const handleSubmit = async (e) => {
@@ -194,24 +150,14 @@ const PassengerForm = () => {
 
         // console.log(FormData);
 
-        try {
-
-            let response = await axios.post("http://localhost:3000/passenger/add", FormData, {
-                headers: {
-                    "Content-type": "Application/json",
-                }
-            })
-
-
-            if (response.status === 201) {
+        createItem("passenger", FormData).then((status) => {
+            if (status === 201) {
                 toast.success("Passenger added successfully!");
                 resetTheForm();
                 Navigate("/login");
             }
+        });
 
-        } catch (error) {
-            console.log("Passenger Form: " + error);
-        }
     }
 
 
@@ -310,6 +256,7 @@ const PassengerForm = () => {
     )
 }
 
+
 const RouteForm = () => {
 
     const Navigate = useNavigate();
@@ -337,34 +284,17 @@ const RouteForm = () => {
 
     useEffect(() => {
         if (routeInfo_id) {
-            LoadOldData(routeInfo_id);
+            GetItemById("routes", routeInfo_id).then((data) => {
+                setFormData({
+                    routeInfo_id: data.routeInfo_id,
+                    routeInfo_origin: data.routeInfo_origin,
+                    routeInfo_destination: data.routeInfo_destination,
+                    routeInfo_distance: data.routeInfo_distance,
+                    routeInfo_traveltime: data.routeInfo_traveltime,
+                });
+            });
         }
     }, []);
-
-
-    const LoadOldData = async (routeInfo_id) => {
-
-        try {
-
-            let response = await axios.get(`http://localhost:3000/routes/id/${routeInfo_id}`, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-
-            setFormData({
-                routeInfo_id: response.data.routeInfo_id,
-                routeInfo_origin: response.data.routeInfo_origin,
-                routeInfo_destination: response.data.routeInfo_destination,
-                routeInfo_distance: response.data.routeInfo_distance,
-                routeInfo_traveltime: response.data.routeInfo_traveltime,
-            });
-
-        } catch (error) {
-            console.log("Patient " + error);
-        }
-    }
 
     const handleUpdate = async (e) => {
         e.preventDefault();
@@ -375,24 +305,14 @@ const RouteForm = () => {
             return;
         }
 
-        try {
-
-            let response = await axios.put(`http://localhost:3000/routes/update/${routeInfo_id}`, FormData, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-
-            if (response.status === 200) {
+        updateItem("routes", routeInfo_id, FormData).then((status) => {
+            if (status === 200) {
                 toast.success("Route details updated successfully!");
                 resetTheForm();
                 Navigate("/routelist");
             }
+        })
 
-        } catch (error) {
-            console.log("Route Update " + error);
-        }
     }
 
     const handleSubmit = async (e) => {
@@ -407,24 +327,13 @@ const RouteForm = () => {
 
         // console.log(FormData);
 
-        try {
-
-            let response = await axios.post("http://localhost:3000/routes/add", FormData, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-
-
-            if (response.status === 201) {
+        createItem("routes", FormData).then((status) => {
+            if (status === 201) {
                 toast.success("Route added successfully!");
                 resetTheForm();
             }
+        });
 
-        } catch (error) {
-            console.log("Route Form: " + error);
-        }
     }
 
     const resetTheForm = () => {
@@ -501,37 +410,21 @@ const BusForm = () => {
 
     useEffect(() => {
         if (pbusId) {
-            LoadOldData(pbusId);
+            GetItemById("bus", pbusId).then((data) => {
+                setbus_id(data.bus_id);
+                setbus_name(data.bus_name);
+                setlower_left(data.lower_left);
+                setlower_right(data.lower_right);
+                setratePerKm(data.ratePerKm);
+                setisUpperDeck(data.isUpperDeck);
+                setisACBus(data.isACBus);
+                setwaterBottle(data.waterBottle);
+                setblanket(data.blanket);
+                setchargingPoint(data.chargingPoint);
+            });
         }
     }, []);
 
-
-    const LoadOldData = async (pbusId) => {
-
-        try {
-
-            let response = await axios.get(`http://localhost:3000/bus/id/${pbusId}`, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-
-            setbus_id(response.data.bus_id);
-            setbus_name(response.data.bus_name);
-            setlower_left(response.data.lower_left);
-            setlower_right(response.data.lower_right);
-            setratePerKm(response.data.ratePerKm);
-            setisUpperDeck(response.data.isUpperDeck);
-            setisACBus(response.data.isACBus);
-            setwaterBottle(response.data.waterBottle);
-            setblanket(response.data.blanket);
-            setchargingPoint(response.data.chargingPoint);
-
-        } catch (error) {
-            console.log("Bus " + error);
-        }
-    }
 
     const handleUpdate = async (e) => {
         e.preventDefault();
@@ -582,24 +475,14 @@ const BusForm = () => {
             return;
         }
 
-        try {
-
-            let response = await axios.put(`http://localhost:3000/bus/update/${pbusId}`, busData, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-
-            if (response.status === 200) {
+        updateItem("bus", pbusId, busData).then((status) => {
+            if (status === 200) {
                 toast.success("Bus details updated successfully!");
                 resetTheForm();
                 Navigate("/buslist");
             }
+        })
 
-        } catch (error) {
-            console.log("Bus Update " + error);
-        }
     }
 
     const handleSubmit = async (e) => {
@@ -655,24 +538,13 @@ const BusForm = () => {
             return;
         }
 
-        try {
-
-            let response = await axios.post("http://localhost:3000/bus/add", busData, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-
-
-            if (response.status === 201) {
+        createItem("bus", busData).then((status) => {
+            if (status === 201) {
                 toast.success("Bus added successfully!");
                 resetTheForm();
             }
+        });
 
-        } catch (error) {
-            console.log("Bus Form: " + error);
-        }
     }
 
     const resetTheForm = () => {
@@ -863,28 +735,12 @@ const BookingForm = () => {
         fetchData();
     }, [])
 
-    const fetchData = async () => {
-        try {
-            let bus_response = await axios.get("http://localhost:3000/bus", {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            setListOfBuses(bus_response.data)
+    const fetchData = () => {
 
-            let route_response = await axios.get("http://localhost:3000/routes", {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            setListOfRoutes(route_response.data)
-        } catch (error) {
-            console.log("Booking Form " + error);
-        }
+        listItem("bus").then(data => setListOfBuses(data));
+        listItem("routes").then(data => setListOfRoutes(data));
+
     }
-
 
     const handleChanges = (event) => {
         let selectDateTime = event.target.value;
@@ -944,24 +800,12 @@ const BookingForm = () => {
             return;
         }
 
-
-        try {
-
-            let response = await axios.post("http://localhost:3000/bookinginfo/add", FormData, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-
-            if (response.status === 201) {
+        createItem("bookinginfo", FormData).then((status) => {
+            if (status === 201) {
                 toast.success("Bus Route added successfully!");
                 resetTheForm();
             }
-
-        } catch (error) {
-            console.log("Booking Form add: " + error);
-        }
+        });
     }
 
 
@@ -1077,4 +921,5 @@ const BookingForm = () => {
 }
 
 
-export { PassengerForm, RouteForm, BusForm, BookingForm };   
+export { BookingForm, BusForm, PassengerForm, RouteForm };
+

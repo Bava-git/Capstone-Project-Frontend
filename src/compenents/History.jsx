@@ -1,11 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'sonner';
-import { format } from 'date-fns';
 import { jwtDecode } from "jwt-decode";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import { useEffect, useState } from 'react';
+import { listItem } from '../util/API_HUB';
 
 const History = () => {
 
@@ -16,25 +11,14 @@ const History = () => {
 
 
     useEffect(() => {
-        fetchData();
-    }, [])
-
-    const fetchData = async () => {
-        try {
-            let response = await axios.get(`http://localhost:3000/passengerbookingInfo`, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            let getdata = response.data;
-            setPassengerHistory(getdata.filter((element) => {
-                return element.passenger_id === passenger_id;
-            }))
-        } catch (error) {
-            console.log("Profile " + error);
+        if (passenger_id) {
+            listItem("passengerbookingInfo").then((data) => {
+                setPassengerHistory(data.filter((element) => {
+                    return element.passenger_id === passenger_id;
+                }))
+            });
         }
-    }
+    }, [])
 
     // const downloadPDF = () => {
     //     const element = document.getElementById("pdf-content"); // Capture this div
@@ -111,3 +95,4 @@ const History = () => {
 }
 
 export { History };
+

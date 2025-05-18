@@ -298,16 +298,18 @@ const ResultPage = () => {
         blockedSeatsArr.map((bookedseat) => {
             let seat = bookedseat.bookedSeatNum;
             BookedSeats.push(seat);
+            // if (BookedSeats.includes((Number(seat.substring(2)) - 1)) || BookedSeats.includes((Number(seat.substring(2)) + 1))) {
             ((bookedseat.passenger_gender === "Male") ?
                 ((Number(seat.substring(2)) % 2 === 0) ?
                     maleholdSeat.push(seat.substring(0, 2) + (Number(seat.substring(2)) - 1)) : maleholdSeat.push(seat.substring(0, 2) + (Number(seat.substring(2)) + 1))) :
                 ((Number(seat.substring(2)) % 2 === 0) ?
                     femaleholdSeat.push(seat.substring(0, 2) + (Number(seat.substring(2)) - 1)) : femaleholdSeat.push(seat.substring(0, 2) + (Number(seat.substring(2)) + 1)))
             )
+            // }
         })
         setLowerLeft(leftseatnum.map((seat) => (
             blockedSeatsArr.length > 0 ? (
-                blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ? (
+                blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ? AlreadyCreated.push(seat) && (
                     <div className='perseat' key={seat}>
                         < label className='blockedseats' >
                             {leftseattype === "Seater" ?
@@ -360,7 +362,7 @@ const ResultPage = () => {
         AlreadyCreated.length = 0
         setLowerRight(rightseatnum.map((seat) => (
             blockedSeatsArr.length > 0 ? (
-                blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ?
+                blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ? AlreadyCreated.push(seat) &&
                     (
                         < div className='perseat' key={seat} >
                             < label className='blockedseats' >
@@ -383,7 +385,7 @@ const ResultPage = () => {
                                         <span className='perseatprice'>&#8377;{lowerrightsleeperprice}</span></>}
                             </label >
                         </div >
-                    ) : (!AlreadyCreated.includes(seat) && maleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
+                    ) : (!BookedSeats.includes(seat) && !AlreadyCreated.includes(seat) && maleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
                         <div className='perseat' key={seat} >
                             < label className='selector' >
                                 <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
@@ -395,7 +397,7 @@ const ResultPage = () => {
                                         <span className='perseatprice'>&#8377;{lowerrightsleeperprice}</span></>}
                             </label >
                         </div >
-                    ) : (!AlreadyCreated.includes(seat) && femaleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
+                    ) : (!BookedSeats.includes(seat) && !AlreadyCreated.includes(seat) && femaleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
                         <div className='perseat' key={seat} >
                             < label className='selector' >
                                 <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
@@ -424,9 +426,6 @@ const ResultPage = () => {
             )
         )));
 
-        console.log("AlreadyCreated " + AlreadyCreated);
-        console.log("maleholdSeat " + maleholdSeat);
-        console.log("femaleholdSeat " + femaleholdSeat);
 
         if (Bus.isUpperDeck) {
 
@@ -439,7 +438,7 @@ const ResultPage = () => {
             AlreadyCreated.length = 0
             setUpperLeft(upperleftseatnum.map((seat) => (
                 blockedSeatsArr.length > 0 ? (
-                    blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ? (
+                    blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ? AlreadyCreated.push(seat) && (
                         <div className='perseat' key={seat}>
                             < label className='blockedseats' >
                                 {upperleftseattype === "Seater" ?
@@ -488,7 +487,7 @@ const ResultPage = () => {
             AlreadyCreated.length = 0;
             setUpperRight(upperrightseatnum.map((seat) => (
                 blockedSeatsArr.length > 0 ? (
-                    blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ?
+                    blockedSeatsArr.map((blockedseats) => (blockedseats.bookedSeatNum === seat) ? AlreadyCreated.push(seat) &&
                         (
                             < div className='perseat' key={seat} >
                                 < label className='blockedseats' >
@@ -511,7 +510,7 @@ const ResultPage = () => {
                                             <span className='perseatprice'>&#8377;{upperrightsleeperprice}</span></>}
                                 </label >
                             </div >
-                        ) : (!AlreadyCreated.includes(seat) && maleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
+                        ) : (!BookedSeats.includes(seat) && !AlreadyCreated.includes(seat) && maleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
                             <div className='perseat' key={seat} >
                                 < label className='selector' >
                                     <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
@@ -523,7 +522,7 @@ const ResultPage = () => {
                                             <span className='perseatprice'>&#8377;{upperrightsleeperprice}</span></>}
                                 </label >
                             </div >
-                        ) : (!AlreadyCreated.includes(seat) && femaleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
+                        ) : (!BookedSeats.includes(seat) && !AlreadyCreated.includes(seat) && femaleholdSeat.includes(seat)) ? AlreadyCreated.push(seat) && (
                             <div className='perseat' key={seat} >
                                 < label className='selector' >
                                     <input type="checkbox" checked={selectedArr.includes(seat)} onChange={(event) => handleSelector(seat, event, Bus, schedule)} />
@@ -754,8 +753,6 @@ const ResultPage = () => {
 
         });
 
-
-
         try {
 
             let blockseatres = await axios.post("http://localhost:3000/busbookinginfo/add/all", busStorage, {
@@ -777,13 +774,20 @@ const ResultPage = () => {
                     toast.success("Tickets are booked successfully!");
                     setTimeout(() => {
                         Navigate("/history");
-                    }, 2000);
+                    }, 1000);
                 }
             }
 
         } catch (error) {
-            console.log("Booking Form add: " + error);
-            toast.error(error);
+            console.log("Block seat & book ticket for passenger:", error);
+            // if (error.response && error.response.status === 401) {
+            //     alert("Session expired. Please log in again.");
+            //     localStorage.removeItem("role");  // Remove invalid token
+            //     localStorage.removeItem("token");  // Remove invalid token
+            //     window.location.href = "/login";  // Redirect to login page
+            // } else {
+            //     console.error("API Error:", error);
+            // }
         }
 
     }

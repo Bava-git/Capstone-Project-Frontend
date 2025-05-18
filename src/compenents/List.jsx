@@ -1,10 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'sonner';
 import { format } from 'date-fns';
-
-const baseURL = "http://localhost:3000";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { deleteItem, listItem } from '../util/API_HUB';
 
 const ListPassenger = () => {
     const [ListItem, setListItem] = useState([]);
@@ -14,41 +12,23 @@ const ListPassenger = () => {
         fetchData();
     }, [])
 
-    const fetchData = async () => {
-        try {
-            let response = await axios.get(`${baseURL}/passenger`, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            setListItem(response.data)
-        } catch (error) {
-            console.log("ListPassenger " + error);
-        }
+    const fetchData = () => {
+        listItem("passenger").then(data => setListItem(data));
     }
 
-    const handleUpdate = async (passenger_id) => {
+    const handleUpdate = (passenger_id) => {
         Navigate(`/passengerform?passenger_id=${passenger_id}`);
     }
 
-    const handleDelete = async (passenger_id) => {
-        try {
-            let response = await axios.delete(`${baseURL}/passenger/delete/${passenger_id}`, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
+    const handleDelete = (passenger_id) => {
 
-            if (response.status === 200) {
+        deleteItem("passenger", passenger_id).then((res) => {
+            if (res === 200) {
                 toast.success("Deleted successfully!")
                 fetchData();
             }
+        })
 
-        } catch (error) {
-            console.log("ListPassenger " + error);
-        }
     }
 
     const MyArr = [];
@@ -105,41 +85,23 @@ const ListBus = () => {
         fetchData();
     }, [])
 
-    const fetchData = async () => {
-        try {
-            let response = await axios.get(`${baseURL}/bus`, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            setListItem(response.data)
-        } catch (error) {
-            console.log("ListBus " + error);
-        }
+    const fetchData = () => {
+        listItem("bus").then(data => setListItem(data));
+    }
+
+    const handleDelete = (bus_id) => {
+
+        deleteItem("bus", bus_id).then((res) => {
+            if (res === 200) {
+                toast.success("Deleted successfully!")
+                fetchData();
+            }
+        })
+
     }
 
     const handleUpdate = async (bus_id) => {
         Navigate(`/busform?bus_id=${bus_id}`);
-    }
-
-    const handleDelete = async (bus_id) => {
-        try {
-            let response = await axios.delete(`${baseURL}/bus/delete/${bus_id}`, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-
-            if (response.status === 200) {
-                toast.success("Deleted successfully!")
-                fetchData();
-            }
-
-        } catch (error) {
-            console.log("ListBus " + error);
-        }
     }
 
     const MyArr = [];
@@ -208,41 +170,22 @@ const ListRoute = () => {
         fetchData();
     }, [])
 
-    const fetchData = async () => {
-        try {
-            let response = await axios.get(`${baseURL}/routes`, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            setListItem(response.data)
-        } catch (error) {
-            console.log("ListBus " + error);
-        }
+    const fetchData = () => {
+        listItem("routes").then(data => setListItem(data));
     }
 
-    const handleUpdate = async (routeInfo_id) => {
+    const handleUpdate = (routeInfo_id) => {
         Navigate(`/routeform?routeInfo_id=${routeInfo_id}`);
     }
 
-    const handleDelete = async (routeInfo_id) => {
-        try {
-            let response = await axios.delete(`${baseURL}/bus/delete/${routeInfo_id}`, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
+    const handleDelete = (routeInfo_id) => {
 
-            if (response.status === 200) {
+        deleteItem("routes", routeInfo_id).then((res) => {
+            if (res === 200) {
                 toast.success("Deleted successfully!")
                 fetchData();
             }
-
-        } catch (error) {
-            console.log("ListBus " + error);
-        }
+        })
     }
 
     const MyArr = [];
@@ -297,37 +240,19 @@ const ListBookingInfo = () => {
         fetchData();
     }, [])
 
-    const fetchData = async () => {
-        try {
-            let response = await axios.get(`${baseURL}/bookinginfo`, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            setListItem(response.data)
-        } catch (error) {
-            console.log("ListBus " + error);
-        }
+    const fetchData = () => {
+        listItem("bookinginfo").then(data => setListItem(data));
     }
 
-    const handleDelete = async (bookingInfo_id) => {
-        try {
-            let response = await axios.delete(`${baseURL}/bookinginfo/delete/${bookingInfo_id}`, {
-                headers: {
-                    "Content-type": "Application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
+    const handleDelete = (bookingInfo_id) => {
 
-            if (response.status === 200) {
+        deleteItem("bookinginfo", bookingInfo_id).then((res) => {
+            if (res === 200) {
                 toast.success("Deleted successfully!")
                 fetchData();
             }
+        })
 
-        } catch (error) {
-            console.log("ListBus " + error);
-        }
     }
 
     const MyArr = [];
@@ -383,4 +308,5 @@ const ListBookingInfo = () => {
     )
 }
 
-export { ListPassenger, ListBus, ListRoute, ListBookingInfo };
+export { ListBookingInfo, ListBus, ListPassenger, ListRoute };
+
